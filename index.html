@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+            --accent-color: #2e59d9;
+            --text-color: #5a5c69;
+            --danger-color: #e74a3b;
+            --success-color: #1cc88a;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+            color: var(--text-color);
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color) 0%, #224abe 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link.active {
+            color: white;
+            font-weight: 700;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            font-weight: 700;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .student-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #d1d3e2;
+        }
+        
+        .search-input {
+            padding-left: 35px;
+            border-radius: 20px;
+            background-color: #f8f9fc;
+            border: 1px solid #d1d3e2;
+        }
+        
+        .action-btns .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #d1d3e2;
+        }
+        
+        .photo-upload-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            object-fit: cover;
+            border: 1px solid #dee2e6;
+            display: none;
+        }
+        
+        .paste-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .paste-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(78, 115, 223, 0.05);
+        }
+        
+        .paste-area i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .social-icon {
+            font-size: 24px;
+            margin: 0 10px;
+            color: var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .social-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        .subject-score {
+            font-weight: bold;
+        }
+        
+        .pass {
+            color: var(--success-color);
+        }
+        
+        .fail {
+            color: var(--danger-color);
+        }
+        
+        .profile-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* Profile Background Styles */
+        .profile-bg-default {
+            background-color: white;
+        }
+        
+        .profile-bg-cute {
+            background-color: #fff0f6;
+            background-image: linear-gradient(135deg, #ffdeeb 0%, #fcc2d7 100%);
+        }
+        
+        .profile-bg-engineering {
+            background-color: #e6f7ff;
+            background-image: 
+                linear-gradient(to bottom right, rgba(91, 173, 254, 0.1) 0%, transparent 50%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="20" font-family="monospace" font-size="10" fill="%235badfe">{ code: true }</text><text x="10" y="40" font-family="monospace" font-size="10" fill="%235badfe">function() {</text><text x="20" y="60" font-family="monospace" font-size="10" fill="%235badfe">return success;</text><text x="10" y="80" font-family="monospace" font-size="10" fill="%235badfe">}</text></svg>');
+        }
+        
+        .profile-bg-dark {
+            background-color: #2d3748;
+            color: #f7fafc;
+        }
+        
+        .profile-bg-nature {
+            background-color: #f0fff4;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M20,50 Q50,20 80,50 T20,50" fill="none" stroke="%2348bb78" stroke-width="2"/><circle cx="30" cy="40" r="5" fill="%2348bb78"/><circle cx="70" cy="40" r="5" fill="%2348bb78"/></svg>');
+        }
+        
+        /* Background Selector Styles */
+        .bg-selector {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .bg-selector-btn {
+            background: rgba(78, 115, 223, 0.8);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bg-options {
+            position: absolute;
+            right: 0;
+            top: 40px;
+            background: white;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 100;
+            width: 180px;
+        }
+        
+        .bg-options.show {
+            display: block;
+        }
+        
+        .bg-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        
+        .bg-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .bg-option-default {
+            background: white;
+        }
+        
+        .bg-option-cute {
+            background: linear-gradient(135deg, #ffdeeb 0%, #fcc2d7 100%);
+        }
+        
+        .bg-option-engineering {
+            background: linear-gradient(135deg, #e6f7ff 0%, #5badfe 100%);
+        }
+        
+        .bg-option-dark {
+            background: #2d3748;
+        }
+        
+        .bg-option-nature {
+            background: linear-gradient(135deg, #f0fff4 0%, #48bb78 100%);
+        }
+        
+        .bg-option-label {
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .bg-option-container {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        
+        .bg-option-container:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .calculator-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 20px;
+        }
+        
+        .progress {
+            height: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+        
+        .back-btn {
+            margin-bottom: 20px;
+        }
+        
+        .grade-card {
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            animation: gradientBG 15s ease infinite;
+            background-size: 400% 400%;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+        
+        .login-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .login-body {
+            padding: 30px;
+            background-color: white;
+        }
+        
+        .form-floating label {
+            color: #6c757d;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .login-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Animations */
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .slide-in-left {
+            animation: slideInLeft 0.5s ease-out;
+        }
+        
+        .slide-in-right {
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        /* Toggle between login and register forms */
+        .register-form {
+            display: none;
+        }
+        
+        /* App container (hidden until login) */
+        .app-container {
+            display: none;
+        }
+        
+        /* Loading spinner */
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <h3><i class="fas fa-user-graduate me-2"></i> Student Manager</h3>
+                <p class="mb-0">Sign in to manage your students</p>
+            </div>
+            <div class="login-body">
+                <!-- Login Form -->
+                <form id="login-form" class="login-form">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="login-identifier" placeholder="Email or Phone" required>
+                        <label for="login-identifier">Email or Phone</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="login-password" placeholder="Password" required>
+                        <label for="login-password">Password</label>
+                    </div>
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary login-btn">
+                            <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <a href="#" id="show-register">Create an account</a>
+                    </div>
+                </form>
+                
+                <!-- Register Form -->
+                <form id="register-form" class="register-form">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="register-name" placeholder="Full Name" required>
+                        <label for="register-name">Full Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="register-email" placeholder="Email" required>
+                        <label for="register-email">Email</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="tel" class="form-control" id="register-phone" placeholder="Phone Number">
+                        <label for="register-phone">Phone Number</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="register-password" placeholder="Password" required>
+                        <label for="register-password">Password</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="register-confirm" placeholder="Confirm Password" required>
+                        <label for="register-confirm">Confirm Password</label>
+                    </div>
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-success login-btn">
+                            <i class="fas fa-user-plus me-2"></i> Register
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <a href="#" id="show-login">Already have an account? Sign In</a>
+                    </div>
+                </form>
+            </div>
+            <div class="login-footer">
+                <p class="mb-0">© 2023 Student Manager. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Spinner -->
+    <div class="spinner-container" id="loading-spinner" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    
+    <!-- Main App Container -->
+    <div class="app-container" id="app-container">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-primary">
+                    <div class="position-sticky pt-3">
+                        <div class="text-center mb-4">
+                            <h4 class="text-white"><i class="fas fa-user-graduate me-2"></i>Student Manager</h4>
+                        </div>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" id="dashboard-link">
+                                    <i class="fas fa-home"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#students-section" id="students-link">
+                                    <i class="fas fa-users"></i> Students
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#add-student-section" id="add-student-link">
+                                    <i class="fas fa-user-plus"></i> Add Student
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#calculator-section" id="calculator-link">
+                                    <i class="fas fa-calculator"></i> Grades Calculator
+                                </a>
+                            </li>
+                            <li class="nav-item mt-4">
+                                <a class="nav-link" href="#" id="logout-link">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4" id="main-content">
+                    <!-- Dashboard View -->
+                    <div id="dashboard-view">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Student Management System</h1>
+                            <div class="btn-toolbar mb-2 mb-md-0">
+                                <div class="btn-group me-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Print</button>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-calendar"></i> <span id="current-date"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Total Students</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-students">0</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                    Average Age</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="average-age">0</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-info shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                    Last Added</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="last-added">None</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-warning shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                    Data Freshness</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="data-freshness">Just now</div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Student Section -->
+                        <div class="card mb-4" id="add-student-section">
+                            <div class="card-header">
+                                <i class="fas fa-user-plus me-2"></i>Add New Student
+                            </div>
+                            <div class="card-body">
+                                <form id="student-form">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="name" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="name" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="age" class="form-label">Age</label>
+                                            <input type="number" class="form-control" id="age" min="10" max="99" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="phone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phone" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="email" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="telegram" class="form-label">Telegram</label>
+                                            <input type="text" class="form-control" id="telegram" placeholder="@username">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="facebook" class="form-label">Facebook</label>
+                                            <input type="text" class="form-control" id="facebook" placeholder="username">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <label class="form-label">Student Photo</label>
+                                            <div class="photo-upload-container">
+                                                <button type="button" class="btn btn-outline-primary" id="upload-btn">
+                                                    <i class="fas fa-upload me-1"></i> Upload
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" id="paste-btn">
+                                                    <i class="fas fa-paste me-1"></i> Paste (Ctrl+V)
+                                                </button>
+                                                <input type="file" id="photo-upload" accept="image/*" style="display: none;">
+                                            </div>
+                                            <div class="paste-area" id="paste-area">
+                                                <i class="fas fa-image"></i>
+                                                <p>Paste image here (Ctrl+V)</p>
+                                            </div>
+                                            <img id="photo-preview" class="photo-preview" alt="Preview">
+                                            <input type="hidden" id="photo" name="photo">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i> Save Student
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="clear-form">
+                                        <i class="fas fa-eraser me-1"></i> Clear Form
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Search Section -->
+                        <div class="card mb-4" id="search-section">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-search me-2"></i>Search Students
+                                </div>
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control search-input" id="search-input" placeholder="Search by name, email, or phone...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Students List Section -->
+                        <div class="card" id="students-section">
+                            <div class="card-header">
+                                <i class="fas fa-users me-2"></i>Students List
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="students-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Photo</th>
+                                                <th>Name</th>
+                                                <th>Age</th>
+                                                <th>Phone</th>
+                                                <th>Email</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="students-list">
+                                            <!-- Students will be added here dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="empty-state" id="empty-state">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <h4>No Students Found</h4>
+                                    <p>Add your first student using the form above</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile View (hidden by default) -->
+                    <div id="profile-view" style="display: none;">
+                        <button class="btn btn-secondary back-btn" id="back-to-list">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Students
+                        </button>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="profile-section text-center profile-bg-default" id="profile-container">
+                                    <!-- Background selector button -->
+                                    <div class="bg-selector">
+                                        <button class="bg-selector-btn" id="bg-selector-btn">
+                                            <i class="fas fa-palette"></i>
+                                        </button>
+                                        <div class="bg-options" id="bg-options">
+                                            <div class="bg-option-container" data-bg="default">
+                                                <div class="bg-option bg-option-default"></div>
+                                                <span class="bg-option-label">Default</span>
+                                            </div>
+                                            <div class="bg-option-container" data-bg="cute">
+                                                <div class="bg-option bg-option-cute"></div>
+                                                <span class="bg-option-label">Cute</span>
+                                            </div>
+                                            <div class="bg-option-container" data-bg="engineering">
+                                                <div class="bg-option bg-option-engineering"></div>
+                                                <span class="bg-option-label">Engineering</span>
+                                            </div>
+                                            <div class="bg-option-container" data-bg="dark">
+                                                <div class="bg-option bg-option-dark"></div>
+                                                <span class="bg-option-label">Dark</span>
+                                            </div>
+                                            <div class="bg-option-container" data-bg="nature">
+                                                <div class="bg-option bg-option-nature"></div>
+                                                <span class="bg-option-label">Nature</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <img id="profile-photo" class="profile-photo mb-3" src="" alt="Profile Photo">
+                                    <h3 id="profile-name"></h3>
+                                    <p class="text-muted" id="profile-age"></p>
+                                    
+                                    <div class="mt-4">
+                                        <a href="#" id="profile-telegram" class="social-icon"><i class="fab fa-telegram"></i></a>
+                                        <a href="#" id="profile-facebook" class="social-icon"><i class="fab fa-facebook"></i></a>
+                                        <a href="#" id="profile-email" class="social-icon"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <p><i class="fas fa-phone me-2"></i> <span id="profile-phone"></span></p>
+                                        <p><i class="fas fa-envelope me-2"></i> <span id="profile-email-text"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <div class="card grade-card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-graduation-cap me-2"></i>Academic Performance
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Subject</th>
+                                                        <th>Score</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="grades-list">
+                                                    <!-- Grades will be added here dynamically -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <h5>Overall Performance</h5>
+                                            <div class="progress">
+                                                <div class="progress-bar" id="overall-progress" role="progressbar"></div>
+                                            </div>
+                                            <p>Average Score: <span id="average-score" class="subject-score"></span></p>
+                                            <p>Status: <span id="overall-status" class="subject-score"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grades Calculator (hidden by default) -->
+                    <div id="calculator-view" style="display: none;">
+                        <button class="btn btn-secondary back-btn" id="back-to-dashboard">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                        </button>
+                        
+                        <div class="calculator-card">
+                            <h3><i class="fas fa-calculator me-2"></i>Grades Calculator</h3>
+                            <p class="text-muted">Calculate average scores for students</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="calc-student" class="form-label">Select Student</label>
+                                        <select class="form-select" id="calc-student">
+                                            <option value="">-- Select Student --</option>
+                                            <!-- Students will be added here dynamically -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-3" id="calculator-section">
+                                <div class="col-md-12">
+                                    <h5>Enter Subject Scores</h5>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="subject1" class="form-label">Subject 1</label>
+                                            <input type="number" class="form-control subject-score-input" id="subject1" min="0" max="100">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="subject2" class="form-label">Subject 2</label>
+                                            <input type="number" class="form-control subject-score-input" id="subject2" min="0" max="100">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="subject3" class="form-label">Subject 3</label>
+                                            <input type="number" class="form-control subject-score-input" id="subject3" min="0" max="100">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="subject4" class="form-label">Subject 4</label>
+                                            <input type="number" class="form-control subject-score-input" id="subject4" min="0" max="100">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="subject5" class="form-label">Subject 5</label>
+                                            <input type="number" class="form-control subject-score-input" id="subject5" min="0" max="100">
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" id="calculate-btn">
+                                        <i class="fas fa-calculator me-1"></i> Calculate Average
+                                    </button>
+                                    <button class="btn btn-success" id="save-grades-btn">
+                                        <i class="fas fa-save me-1"></i> Save Grades
+                                    </button>
+                                    
+                                    <div class="mt-4" id="calculation-results" style="display: none;">
+                                        <h5>Results</h5>
+                                        <p>Total Score: <span id="total-score" class="subject-score"></span></p>
+                                        <p>Average Score: <span id="calc-average-score" class="subject-score"></span></p>
+                                        <p>Status: <span id="calc-status" class="subject-score"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-student-form">
+                        <input type="hidden" id="edit-id">
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="edit-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="edit-age" min="10" max="99" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="edit-phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="edit-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-telegram" class="form-label">Telegram</label>
+                            <input type="text" class="form-control" id="edit-telegram" placeholder="@username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-facebook" class="form-label">Facebook</label>
+                            <input type="text" class="form-control" id="edit-facebook" placeholder="username">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Student Photo</label>
+                            <div class="photo-upload-container">
+                                <button type="button" class="btn btn-outline-primary" id="edit-upload-btn">
+                                    <i class="fas fa-upload me-1"></i> Upload
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="edit-paste-btn">
+                                    <i class="fas fa-paste me-1"></i> Paste (Ctrl+V)
+                                </button>
+                                <input type="file" id="edit-photo-upload" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="paste-area" id="edit-paste-area">
+                                <i class="fas fa-image"></i>
+                                <p>Paste image here (Ctrl+V)</p>
+                            </div>
+                            <img id="edit-photo-preview" class="photo-preview" alt="Preview">
+                            <input type="hidden" id="edit-photo" name="edit-photo">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-edit">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Grades Modal -->
+    <div class="modal fade" id="editGradesModal" tabindex="-1" aria-labelledby="editGradesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGradesModalLabel">Edit Grades</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-grades-form">
+                        <input type="hidden" id="edit-grades-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-subject1" class="form-label">Subject 1</label>
+                                <input type="number" class="form-control" id="edit-subject1" min="0" max="100">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-subject2" class="form-label">Subject 2</label>
+                                <input type="number" class="form-control" id="edit-subject2" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-subject3" class="form-label">Subject 3</label>
+                                <input type="number" class="form-control" id="edit-subject3" min="0" max="100">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-subject4" class="form-label">Subject 4</label>
+                                <input type="number" class="form-control" id="edit-subject4" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-subject5" class="form-label">Subject 5</label>
+                                <input type="number" class="form-control" id="edit-subject5" min="0" max="100">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-grades-edit">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this student? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample initial data - removed the default students
+        let students = [];
+        
+        // User accounts
+        let users = [
+            {
+                id: 1,
+                name: "Admin User",
+                email: "admin@example.com",
+                phone: "1234567890",
+                password: "admin123"
+            }
+        ];
+        
+        // Current logged in user
+        let currentUser = null;
+
+        // DOM elements
+        const studentForm = document.getElementById('student-form');
+        const studentsList = document.getElementById('students-list');
+        const emptyState = document.getElementById('empty-state');
+        const searchInput = document.getElementById('search-input');
+        const totalStudentsEl = document.getElementById('total-students');
+        const averageAgeEl = document.getElementById('average-age');
+        const lastAddedEl = document.getElementById('last-added');
+        const dataFreshnessEl = document.getElementById('data-freshness');
+        const currentDateEl = document.getElementById('current-date');
+        const editStudentModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+        const editGradesModal = new bootstrap.Modal(document.getElementById('editGradesModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        const dashboardView = document.getElementById('dashboard-view');
+        const profileView = document.getElementById('profile-view');
+        const calculatorView = document.getElementById('calculator-view');
+        const profileContainer = document.getElementById('profile-container');
+        const bgSelectorBtn = document.getElementById('bg-selector-btn');
+        const bgOptions = document.getElementById('bg-options');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegisterLink = document.getElementById('show-register');
+        const showLoginLink = document.getElementById('show-login');
+        const loginPage = document.getElementById('login-page');
+        const appContainer = document.getElementById('app-container');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const logoutLink = document.getElementById('logout-link');
+
+        // Variables for modals
+        let currentEditId = null;
+        let currentDeleteId = null;
+        let currentPhotoBase64 = null;
+        let currentEditPhotoBase64 = null;
+        let currentViewingStudent = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initially show login page
+            loginPage.style.display = 'flex';
+            appContainer.style.display = 'none';
+            
+            // Form submission
+            studentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                addStudent();
+            });
+            
+            // Clear form
+            document.getElementById('clear-form').addEventListener('click', function() {
+                studentForm.reset();
+                document.getElementById('photo-preview').style.display = 'none';
+                document.getElementById('photo-preview').src = '#';
+                document.getElementById('photo').value = '';
+                currentPhotoBase64 = null;
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                renderStudents();
+            });
+            
+            // Save edit
+            document.getElementById('save-edit').addEventListener('click', function() {
+                saveEdit();
+            });
+            
+            // Confirm delete
+            document.getElementById('confirm-delete').addEventListener('click', function() {
+                deleteStudent(currentDeleteId);
+                confirmModal.hide();
+            });
+            
+            document.getElementById('upload-btn').addEventListener('click', function() {
+                document.getElementById('photo-upload').click();
+            });
+            
+            document.getElementById('edit-upload-btn').addEventListener('click', function() {
+                document.getElementById('edit-photo-upload').click();
+            });
+            
+            // Photo upload change
+            document.getElementById('photo-upload').addEventListener('change', function(e) {
+                handleImageUpload(e.target.files[0], 'photo-preview', 'photo');
+            });
+            
+            // Edit photo upload change
+            document.getElementById('edit-photo-upload').addEventListener('change', function(e) {
+                handleImageUpload(e.target.files[0], 'edit-photo-preview', 'edit-photo');
+            });
+            
+            // Paste area click
+            document.getElementById('paste-area').addEventListener('click', function() {
+                this.focus();
+            });
+            
+            // Edit paste area click
+            document.getElementById('edit-paste-area').addEventListener('click', function() {
+                this.focus();
+            });
+            
+            // Paste event for main form
+            document.getElementById('paste-area').addEventListener('paste', function(e) {
+                handlePasteEvent(e, 'photo-preview', 'photo');
+            });
+            
+            // Paste event for edit form
+            document.getElementById('edit-paste-area').addEventListener('paste', function(e) {
+                handlePasteEvent(e, 'edit-photo-preview', 'edit-photo');
+            });
+            
+            // Global paste handler (Ctrl+V)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'v') {
+                    const activeElement = document.activeElement;
+                    if (activeElement.id === 'paste-area' || activeElement.id === 'edit-paste-area') {
+                        // Let the paste area handle it
+                        return;
+                    }
+                    
+                    // Check which form is more "active" to decide where to paste
+                    if (document.getElementById('edit-student-form').contains(activeElement)) {
+                        document.getElementById('edit-paste-area').focus();
+                    } else {
+                        document.getElementById('paste-area').focus();
+                    }
+                }
+            });
+            
+            // Back to list button
+            document.getElementById('back-to-list').addEventListener('click', function() {
+                showDashboardView();
+            });
+            
+            // Back to dashboard button
+            document.getElementById('back-to-dashboard').addEventListener('click', function() {
+                showDashboardView();
+            });
+            
+            // Calculate button
+            document.getElementById('calculate-btn').addEventListener('click', function() {
+                calculateGrades();
+            });
+            
+            // Save grades button
+            document.getElementById('save-grades-btn').addEventListener('click', function() {
+                saveGrades();
+            });
+            
+            // Save grades edit button
+            document.getElementById('save-grades-edit').addEventListener('click', function() {
+                saveGradesEdit();
+            });
+            
+            // Navigation links
+            document.getElementById('dashboard-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showDashboardView();
+            });
+            
+            document.getElementById('students-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showDashboardView();
+                document.getElementById('students-section').scrollIntoView();
+            });
+            
+            document.getElementById('add-student-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showDashboardView();
+                document.getElementById('add-student-section').scrollIntoView();
+            });
+            
+            document.getElementById('calculator-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showCalculatorView();
+            });
+            
+            // Student dropdown change
+            document.getElementById('calc-student').addEventListener('change', function() {
+                loadStudentGrades(this.value);
+            });
+            
+            // Background selector functionality
+            bgSelectorBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                bgOptions.classList.toggle('show');
+            });
+            
+            // Close selector when clicking outside
+            document.addEventListener('click', function() {
+                bgOptions.classList.remove('show');
+            });
+            
+            // Prevent closing when clicking inside selector
+            bgOptions.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Change background when option is clicked
+            document.querySelectorAll('.bg-option-container').forEach(option => {
+                option.addEventListener('click', function() {
+                    const bgStyle = this.getAttribute('data-bg');
+                    profileContainer.className = 'profile-section text-center profile-bg-' + bgStyle;
+                    
+                    // Save preference to student object
+                    if (currentViewingStudent) {
+                        currentViewingStudent.profileBg = bgStyle;
+                        // Update in students array
+                        const index = students.findIndex(s => s.id === currentViewingStudent.id);
+                        if (index !== -1) {
+                            students[index].profileBg = bgStyle;
+                        }
+                    }
+                    
+                    bgOptions.classList.remove('show');
+                });
+            });
+            
+            // Login form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const identifier = document.getElementById('login-identifier').value;
+                const password = document.getElementById('login-password').value;
+                
+                // Show loading spinner
+                loadingSpinner.style.display = 'flex';
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    loginUser(identifier, password);
+                    loadingSpinner.style.display = 'none';
+                }, 1000);
+            });
+            
+            // Register form submission
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const phone = document.getElementById('register-phone').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm').value;
+                
+                if (password !== confirmPassword) {
+                    showAlert('Passwords do not match', 'danger');
+                    return;
+                }
+                
+                // Show loading spinner
+                loadingSpinner.style.display = 'flex';
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    registerUser(name, email, phone, password);
+                    loadingSpinner.style.display = 'none';
+                }, 1000);
+            });
+            
+            // Toggle between login and register forms
+            showRegisterLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                registerForm.classList.add('slide-in-right');
+                
+                setTimeout(() => {
+                    registerForm.classList.remove('slide-in-right');
+                }, 500);
+            });
+            
+            showLoginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                loginForm.classList.add('slide-in-left');
+                
+                setTimeout(() => {
+                    loginForm.classList.remove('slide-in-left');
+                }, 500);
+            });
+            
+            // Logout link
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+        });
+
+        // Login user
+        function loginUser(identifier, password) {
+            // Check if identifier is email or phone
+            const isEmail = identifier.includes('@');
+            
+            // Find user
+            const user = users.find(u => {
+                if (isEmail) {
+                    return u.email === identifier && u.password === password;
+                } else {
+                    return u.phone === identifier && u.password === password;
+                }
+            });
+            
+            if (user) {
+                currentUser = user;
+                loginPage.style.display = 'none';
+                appContainer.style.display = 'block';
+                showDashboardView();
+                
+                // Initialize app data
+                renderStudents();
+                updateStats();
+                setCurrentDate();
+                updateCalculatorDropdown();
+                
+                showAlert(`Welcome back, ${user.name}!`, 'success');
+            } else {
+                showAlert('Invalid credentials. Please try again.', 'danger');
+            }
+        }
+
+        // Register user
+        function registerUser(name, email, phone, password) {
+            // Check if email already exists
+            if (users.some(u => u.email === email)) {
+                showAlert('Email already registered', 'danger');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                phone,
+                password
+            };
+            
+            users.push(newUser);
+            currentUser = newUser;
+            
+            // Switch to login form and show success message
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            
+            showAlert('Registration successful! Please login with your new account.', 'success');
+        }
+
+        // Logout user
+        function logoutUser() {
+            currentUser = null;
+            appContainer.style.display = 'none';
+            loginPage.style.display = 'flex';
+            
+            // Reset forms
+            loginForm.reset();
+            registerForm.reset();
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            
+            showAlert('You have been logged out successfully', 'info');
+        }
+
+        // Handle image upload
+        function handleImageUpload(file, previewId, inputId) {
+            if (!file.type.match('image.*')) {
+                showAlert('Please select an image file', 'danger');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById(previewId);
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                document.getElementById(inputId).value = e.target.result;
+                
+                if (inputId === 'photo') {
+                    currentPhotoBase64 = e.target.result;
+                } else {
+                    currentEditPhotoBase64 = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle paste event
+        function handlePasteEvent(e, previewId, inputId) {
+            const items = (e.clipboardData || window.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const blob = items[i].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const preview = document.getElementById(previewId);
+                        preview.src = event.target.result;
+                        preview.style.display = 'block';
+                        document.getElementById(inputId).value = event.target.result;
+                        
+                        if (inputId === 'photo') {
+                            currentPhotoBase64 = event.target.result;
+                        } else {
+                            currentEditPhotoBase64 = event.target.result;
+                        }
+                        
+                        showAlert('Image pasted successfully!', 'success');
+                    };
+                    reader.readAsDataURL(blob);
+                    break;
+                }
+            }
+        }
+
+        // Set current date
+        function setCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            currentDateEl.textContent = new Date().toLocaleDateString('en-US', options);
+        }
+
+        // Add a new student
+        function addStudent() {
+            const name = document.getElementById('name').value;
+            const age = parseInt(document.getElementById('age').value);
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const telegram = document.getElementById('telegram').value;
+            const facebook = document.getElementById('facebook').value;
+            let photo = document.getElementById('photo').value;
+            
+            // Use base64 if available, otherwise fallback to URL or generated avatar
+            if (!photo && currentPhotoBase64) {
+                photo = currentPhotoBase64;
+            } else if (!photo) {
+                photo = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+            }
+            
+            const newStudent = {
+                id: Date.now(), // Using timestamp as ID
+                name,
+                age,
+                phone,
+                email,
+                telegram,
+                facebook,
+                photo,
+                profileBg: "default", // Default background
+                grades: {
+                    subject1: 0,
+                    subject2: 0,
+                    subject3: 0,
+                    subject4: 0,
+                    subject5: 0
+                }
+            };
+            
+            students.unshift(newStudent); // Add to beginning of array
+            studentForm.reset();
+            document.getElementById('photo-preview').style.display = 'none';
+            document.getElementById('photo-preview').src = '#';
+            currentPhotoBase64 = null;
+            renderStudents();
+            updateStats();
+            updateCalculatorDropdown();
+            
+            // Show success message
+            showAlert('Student added successfully!', 'success');
+            
+            // Update last added
+            lastAddedEl.textContent = name;
+            dataFreshnessEl.textContent = 'Just now';
+        }
+
+        // Render students list
+        function renderStudents() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredStudents = students.filter(student => 
+                student.name.toLowerCase().includes(searchTerm) ||
+                student.phone.includes(searchTerm) ||
+                student.email.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredStudents.length === 0) {
+                studentsList.innerHTML = '';
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+                studentsList.innerHTML = filteredStudents.map(student => {
+                    // Calculate average grade
+                    const grades = Object.values(student.grades);
+                    const average = grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
+                    const status = average >= 45 ? 'Pass' : 'Fail';
+                    const statusClass = average >= 45 ? 'pass' : 'fail';
+                    
+                    return `
+                        <tr>
+                            <td><img src="${student.photo}" alt="${student.name}" class="student-photo"></td>
+                            <td>${student.name}</td>
+                            <td>${student.age}</td>
+                            <td>${student.phone}</td>
+                            <td>${student.email}</td>
+                            <td><span class="${statusClass}">${status}</span></td>
+                            <td class="action-btns">
+                                <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${student.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info view-btn" data-id="${student.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${student.id}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                // Add event listeners to buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        editStudent(id);
+                    });
+                });
+                
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        viewStudentProfile(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        confirmDelete(id);
+                    });
+                });
+            }
+        }
+
+        // Edit student
+        function editStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (student) {
+                currentEditId = id;
+                currentEditPhotoBase64 = null;
+                document.getElementById('edit-id').value = id;
+                document.getElementById('edit-name').value = student.name;
+                document.getElementById('edit-age').value = student.age;
+                document.getElementById('edit-phone').value = student.phone;
+                document.getElementById('edit-email').value = student.email;
+                document.getElementById('edit-telegram').value = student.telegram || '';
+                document.getElementById('edit-facebook').value = student.facebook || '';
+                
+                const preview = document.getElementById('edit-photo-preview');
+                if (student.photo.startsWith('data:image')) {
+                    preview.src = student.photo;
+                    currentEditPhotoBase64 = student.photo;
+                } else {
+                    preview.src = student.photo;
+                }
+                preview.style.display = 'block';
+                document.getElementById('edit-photo').value = student.photo;
+                
+                editStudentModal.show();
+            }
+        }
+
+        // View student profile
+        function viewStudentProfile(id) {
+            const student = students.find(s => s.id === id);
+            if (student) {
+                currentViewingStudent = student;
+                
+                // Set profile data
+                document.getElementById('profile-name').textContent = student.name;
+                document.getElementById('profile-age').textContent = `${student.age} years old`;
+                document.getElementById('profile-phone').textContent = student.phone;
+                document.getElementById('profile-email-text').textContent = student.email;
+                document.getElementById('profile-photo').src = student.photo;
+                
+                // Set social links
+                document.getElementById('profile-telegram').href = student.telegram ? `https://t.me/${student.telegram.replace('@', '')}` : '#';
+                document.getElementById('profile-facebook').href = student.facebook ? `https://facebook.com/${student.facebook}` : '#';
+                document.getElementById('profile-email').href = `mailto:${student.email}`;
+                
+                // Apply saved background or default
+                const bgStyle = student.profileBg || 'default';
+                profileContainer.className = 'profile-section text-center profile-bg-' + bgStyle;
+                
+                // Render grades
+                renderStudentGrades(student);
+                
+                // Show profile view
+                showProfileView();
+            }
+        }
+
+        // Render student grades
+        function renderStudentGrades(student) {
+            const gradesList = document.getElementById('grades-list');
+            const grades = student.grades;
+            const subjectScores = Object.values(grades);
+            const total = subjectScores.reduce((sum, score) => sum + score, 0);
+            const average = total / subjectScores.length;
+            const overallStatus = average >= 45 ? 'Pass' : 'Fail';
+            const overallStatusClass = average >= 45 ? 'pass' : 'fail';
+            
+            // Update overall performance
+            document.getElementById('overall-progress').style.width = `${average}%`;
+            document.getElementById('average-score').textContent = average.toFixed(1);
+            document.getElementById('overall-status').textContent = overallStatus;
+            document.getElementById('overall-status').className = `subject-score ${overallStatusClass}`;
+            
+            // Render individual subjects
+            gradesList.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const subject = `subject${i}`;
+                const score = grades[subject] || 0;
+                const status = score >= 45 ? 'Pass' : 'Fail';
+                const statusClass = score >= 45 ? 'pass' : 'fail';
+                
+                gradesList.innerHTML += `
+                    <tr>
+                        <td>Subject ${i}</td>
+                        <td><span class="subject-score">${score}</span></td>
+                        <td><span class="${statusClass}">${status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary edit-grade-btn" data-subject="${subject}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Add event listeners to edit grade buttons
+            document.querySelectorAll('.edit-grade-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const subject = this.getAttribute('data-subject');
+                    editGrades(currentViewingStudent.id, subject);
+                });
+            });
+        }
+
+        // Edit grades
+        function editGrades(studentId, subject) {
+            const student = students.find(s => s.id === studentId);
+            if (student) {
+                currentEditId = studentId;
+                
+                // Set current grades
+                document.getElementById('edit-grades-id').value = studentId;
+                document.getElementById('edit-subject1').value = student.grades.subject1;
+                document.getElementById('edit-subject2').value = student.grades.subject2;
+                document.getElementById('edit-subject3').value = student.grades.subject3;
+                document.getElementById('edit-subject4').value = student.grades.subject4;
+                document.getElementById('edit-subject5').value = student.grades.subject5;
+                
+                editGradesModal.show();
+            }
+        }
+
+        // Save edited student
+        function saveEdit() {
+            const id = currentEditId;
+            const name = document.getElementById('edit-name').value;
+            const age = parseInt(document.getElementById('edit-age').value);
+            const phone = document.getElementById('edit-phone').value;
+            const email = document.getElementById('edit-email').value;
+            const telegram = document.getElementById('edit-telegram').value;
+            const facebook = document.getElementById('edit-facebook').value;
+            let photo = document.getElementById('edit-photo').value;
+            
+            // Use base64 if available, otherwise use the existing photo
+            if (currentEditPhotoBase64) {
+                photo = currentEditPhotoBase64;
+            }
+            
+            const index = students.findIndex(s => s.id === id);
+            if (index !== -1) {
+                // Preserve existing grades and background
+                const existingGrades = students[index].grades;
+                const existingBg = students[index].profileBg;
+                
+                students[index] = { 
+                    id, 
+                    name, 
+                    age, 
+                    phone, 
+                    email, 
+                    telegram, 
+                    facebook, 
+                    photo, 
+                    grades: existingGrades,
+                    profileBg: existingBg || 'default'
+                };
+                
+                renderStudents();
+                updateStats();
+                editStudentModal.hide();
+                showAlert('Student updated successfully!', 'success');
+                dataFreshnessEl.textContent = 'Just now';
+                
+                // Update profile view if currently viewing this student
+                if (currentViewingStudent && currentViewingStudent.id === id) {
+                    currentViewingStudent = students[index];
+                    renderStudentGrades(currentViewingStudent);
+                }
+            }
+        }
+
+        // Save grades edit
+        function saveGradesEdit() {
+            const id = parseInt(document.getElementById('edit-grades-id').value);
+            const subject1 = parseInt(document.getElementById('edit-subject1').value) || 0;
+            const subject2 = parseInt(document.getElementById('edit-subject2').value) || 0;
+            const subject3 = parseInt(document.getElementById('edit-subject3').value) || 0;
+            const subject4 = parseInt(document.getElementById('edit-subject4').value) || 0;
+            const subject5 = parseInt(document.getElementById('edit-subject5').value) || 0;
+            
+            const index = students.findIndex(s => s.id === id);
+            if (index !== -1) {
+                students[index].grades = {
+                    subject1,
+                    subject2,
+                    subject3,
+                    subject4,
+                    subject5
+                };
+                
+                renderStudents();
+                editGradesModal.hide();
+                showAlert('Grades updated successfully!', 'success');
+                dataFreshnessEl.textContent = 'Just now';
+                
+                // Update profile view if currently viewing this student
+                if (currentViewingStudent && currentViewingStudent.id === id) {
+                    currentViewingStudent = students[index];
+                    renderStudentGrades(currentViewingStudent);
+                }
+            }
+        }
+
+        // Confirm delete
+        function confirmDelete(id) {
+            currentDeleteId = id;
+            confirmModal.show();
+        }
+
+        // Delete student
+        function deleteStudent(id) {
+            students = students.filter(student => student.id !== id);
+            renderStudents();
+            updateStats();
+            updateCalculatorDropdown();
+            showAlert('Student deleted successfully!', 'danger');
+            dataFreshnessEl.textContent = 'Just now';
+            
+            // If deleted student was being viewed, go back to list
+            if (currentViewingStudent && currentViewingStudent.id === id) {
+                showDashboardView();
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            totalStudentsEl.textContent = students.length;
+            
+            if (students.length > 0) {
+                const totalAge = students.reduce((sum, student) => sum + student.age, 0);
+                const avgAge = (totalAge / students.length).toFixed(1);
+                averageAgeEl.textContent = avgAge;
+            } else {
+                averageAgeEl.textContent = '0';
+                lastAddedEl.textContent = 'None';
+            }
+        }
+
+        // Update calculator dropdown
+        function updateCalculatorDropdown() {
+            const dropdown = document.getElementById('calc-student');
+            dropdown.innerHTML = '<option value="">-- Select Student --</option>';
+            
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                dropdown.appendChild(option);
+            });
+        }
+
+        // Load student grades into calculator
+        function loadStudentGrades(studentId) {
+            if (!studentId) return;
+            
+            const student = students.find(s => s.id === parseInt(studentId));
+            if (student) {
+                document.getElementById('subject1').value = student.grades.subject1;
+                document.getElementById('subject2').value = student.grades.subject2;
+                document.getElementById('subject3').value = student.grades.subject3;
+                document.getElementById('subject4').value = student.grades.subject4;
+                document.getElementById('subject5').value = student.grades.subject5;
+            }
+        }
+
+        // Calculate grades
+        function calculateGrades() {
+            const subject1 = parseInt(document.getElementById('subject1').value) || 0;
+            const subject2 = parseInt(document.getElementById('subject2').value) || 0;
+            const subject3 = parseInt(document.getElementById('subject3').value) || 0;
+            const subject4 = parseInt(document.getElementById('subject4').value) || 0;
+            const subject5 = parseInt(document.getElementById('subject5').value) || 0;
+            
+            const total = subject1 + subject2 + subject3 + subject4 + subject5;
+            const average = total / 5;
+            const status = average >= 45 ? 'Pass' : 'Fail';
+            const statusClass = average >= 45 ? 'pass' : 'fail';
+            
+            document.getElementById('total-score').textContent = total;
+            document.getElementById('calc-average-score').textContent = average.toFixed(1);
+            document.getElementById('calc-status').textContent = status;
+            document.getElementById('calc-status').className = `subject-score ${statusClass}`;
+            
+            document.getElementById('calculation-results').style.display = 'block';
+        }
+
+        // Save grades
+        function saveGrades() {
+            const studentId = document.getElementById('calc-student').value;
+            if (!studentId) {
+                showAlert('Please select a student first', 'danger');
+                return;
+            }
+            
+            const subject1 = parseInt(document.getElementById('subject1').value) || 0;
+            const subject2 = parseInt(document.getElementById('subject2').value) || 0;
+            const subject3 = parseInt(document.getElementById('subject3').value) || 0;
+            const subject4 = parseInt(document.getElementById('subject4').value) || 0;
+            const subject5 = parseInt(document.getElementById('subject5').value) || 0;
+            
+            const index = students.findIndex(s => s.id === parseInt(studentId));
+            if (index !== -1) {
+                students[index].grades = {
+                    subject1,
+                    subject2,
+                    subject3,
+                    subject4,
+                    subject5
+                };
+                
+                renderStudents();
+                showAlert('Grades saved successfully!', 'success');
+                dataFreshnessEl.textContent = 'Just now';
+                
+                // Update profile view if currently viewing this student
+                if (currentViewingStudent && currentViewingStudent.id === parseInt(studentId)) {
+                    currentViewingStudent = students[index];
+                    renderStudentGrades(currentViewingStudent);
+                }
+            }
+        }
+
+        // Show profile view
+        function showProfileView() {
+            dashboardView.style.display = 'none';
+            calculatorView.style.display = 'none';
+            profileView.style.display = 'block';
+        }
+
+        // Show calculator view
+        function showCalculatorView() {
+            dashboardView.style.display = 'none';
+            profileView.style.display = 'none';
+            calculatorView.style.display = 'block';
+            
+            // Update student dropdown
+            updateCalculatorDropdown();
+        }
+
+        // Show dashboard view
+        function showDashboardView() {
+            profileView.style.display = 'none';
+            calculatorView.style.display = 'none';
+            dashboardView.style.display = 'block';
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertDiv.style.zIndex = '1100';
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
